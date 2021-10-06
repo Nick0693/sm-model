@@ -4,7 +4,7 @@ setup(
     name="bathy_merge",
     # description="Bathymetry utilities",
     # author="Nicklas Simonsen",
-    # author_email="nisi@dhigroup.com",
+    # author_email="ni4180si-s@lu.se",
     packages=find_packages(),
     include_package_data=True,
 )
