@@ -1,0 +1,20 @@
+name: sm_model
+channels:
+    - conda-forge
+    - defaults
+dependencies:
+    - python=3.9
+    - numpy
+    - pandas
+    - fiona
+    - rasterio
+    - shapely
+    - geopandas
+    - matplotlib
+    - seaborn
+    - sklearn
+    - tensorflow=2.5.0
+    - ee
+    - pip:
+        - sentinelsat
+        - ismn
