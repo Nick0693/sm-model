@@ -4,7 +4,6 @@ channels:
     - defaults
 dependencies:
     - python=3.9
-    - yaml
     - numpy
     - pandas
     - fiona
@@ -17,4 +16,5 @@ dependencies:
     - ee
     - pip:
         - sentinelsat
+        - pyyaml
         - ismn
