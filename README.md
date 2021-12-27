@@ -15,6 +15,8 @@ Miniconda is a minimal installer for conda and the simplest way to get started w
 ### Setting up an environment with dependencies
 Environments allow you keep different versions of packages for separate projects. Install the environment using the **environment.yml** file and then activate the environment in the Miniconda prompt with `conda activate soil-moisture-rnn`.
 
+#### Installing Basemap
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap
+
 ### Setting up the GEE configurations
 The script relies on the Google Earth Engine python API to extract geospatial information from various layers. To utilize this data the end user must first authorize their account via Google. The authentication is a one-time process that will write a credential file to your local directory with a token. This token is written by typing `earthengine authenticate` in the Miniconda prompt.
-
