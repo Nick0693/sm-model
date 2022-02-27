@@ -1,10 +1,10 @@
 ### Directories ###
 project_name                    : rnn_sm_model
-wrk_dir                         : F:\sm_project\wrk_dir
-data_dir                        : F:\sm_project\sm_data\REMEDHUS.zip
+wrk_dir                         : \path\to\working_directory
+data_dir                        : \path\to\data # for ICOS this will be the main folder and for ISMN it is the .zip
 
 ### Preprocessing specifications ###
-variables                       : ['TS', 'TA', 'P', 'VV', 'VH', 'NDVI', 'NDWI']
+variables                       : ['TS', 'TA', 'P', 'VV', 'VH', 'NDVI', 'NDWI'] # soil temperature, air temperature, precipitation, vertical-vertical (SAR), vertical-horizontal (SAR), Normalized difference vegetation index, Normalized difference (vegetation) water index
 overwrite_variables             : false
 interpolate_index               : true
 data_source                     : ISMN
