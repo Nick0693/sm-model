@@ -19,6 +19,7 @@ Environments allow you keep different versions of packages for separate projects
 The script relies on the Google Earth Engine python API to extract geospatial information from various layers. To utilize this data the end user must first authorize their account via Google. The authentication is a one-time process that will write a credential file to your local directory with a token. This token is written by typing `earthengine authenticate` in the Miniconda prompt.
 
 
+
 ## Preprocessing data
 
 The preprocessing workflow currently works with a collection of ICOS stations ([download from here](https://www.icos-cp.eu/data-services/about-data-portal)) or a collection of sensors from a single network from ISMN ([download from here](https://ismn.geo.tuwien.ac.at/en/)).
@@ -42,6 +43,7 @@ preprocessing.compile_data(/settings.yml)
 ```
 
 The output is a .csv file containing information from all specified variables at daily intervals.
+
 
 
 ## Running the model
