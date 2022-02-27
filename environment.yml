@@ -6,15 +6,10 @@ dependencies:
     - python=3.9
     - numpy
     - pandas
-    - fiona
-    - rasterio
-    - shapely
-    - geopandas
     - matplotlib
-    - sklearn
+    - scikit-learn
     - tensorflow=2.5.0
     - ee
     - pip:
-        - sentinelsat
         - pyyaml
         - ismn
