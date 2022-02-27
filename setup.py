@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="bathy_merge",
-    # description="Bathymetry utilities",
+    name="sm-model",
+    # description="Soil moisture RNN model and data pipeline",
     # author="Nicklas Simonsen",
-    # author_email="ni4180si-s@lu.se",
+    # author_email="nisi@dhigroup.com",
     packages=find_packages(),
     include_package_data=True,
 )
