@@ -44,6 +44,6 @@ preprocessing.compile_data(/settings.yml)
 The output is a .csv file containing information from all specified variables at daily intervals.
 
 
-## Modelling the data
+## Running the model
 
 *Under construction*
