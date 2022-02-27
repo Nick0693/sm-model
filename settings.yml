@@ -7,14 +7,6 @@ data_dir                        : F:\sm_project\sm_data\REMEDHUS.zip
 variables                       : ['TS', 'TA', 'P', 'VV', 'VH', 'NDVI', 'NDWI']
 overwrite_variables             : false
 interpolate_index               : true
-
-earth_engine_settings           :
-    cloud_filter                : 80
-    cloud_probability_threshold : 50
-    nir_threshold               : 0.15
-    cloud_distance              : 1
-    buffer                      : 50
-
 data_source                     : ISMN
 network_name                    : REMEDHUS # only used for ISMN probes
 swc_depth_range                 : [0.0, 0.05] # only used for ISMN probes
