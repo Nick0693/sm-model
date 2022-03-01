@@ -97,7 +97,7 @@ def initialize(settings_path):
             if settings['do_plot']:
                 plotting.plot_climate(df, settings)
 
-            master_df = master_df.append(df)
+            master_df = pd.concat([master_df, df])
 
         except KeyError as e:
             print(e, ' for ', meteo.split('\\')[-1].split('_')[1])
