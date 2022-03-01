@@ -6,6 +6,8 @@ import yaml
 import pandas as pd
 import ee
 
+from timeout import timeout
+
 ee.Initialize()
 
 """
@@ -109,6 +111,7 @@ def add_cld_shdw_mask(img):
 ## with the specified bands.
 ## The buffer attribute should be equal to half the spatial resolution of the final product.
 ## The bands should be given as a list, even for single bands.
+@timeout(600) # limits the time allowed for the function to run. Increase the number if running on a slow network
 def ee_to_df(ee_arr, lon, lat, buffer, int_limit, bands, start_date, end_date):
     # Converts columns to numeric values
     def to_numeric(dataframe, band):
@@ -199,11 +202,17 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
               .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
               .filter(ee.Filter.eq('instrumentMode', 'IW')))
         if 'VV' in variable_list:
-            s1_vv = ee_to_df(s1, lon, lat, 5, 0, ['VV'], start_date, end_date)
-            dataframes.append(s1_vv)
+            try:
+                s1_vv = ee_to_df(s1, lon, lat, 5, 0, ['VV'], start_date, end_date)
+                dataframes.append(s1_vv)
+            except:
+                print('    Connection timed out on variable: VV')
         if 'VH' in variable_list:
-            s1_vh = ee_to_df(s1, lon, lat, 5, 0, ['VH'], start_date, end_date)
-            dataframes.append(s1_vh)
+            try:
+                s1_vh = ee_to_df(s1, lon, lat, 5, 0, ['VH'], start_date, end_date)
+                dataframes.append(s1_vh)
+            except:
+                print('    Connection timed out on variable: VH')
 
     # Sentinel-2 Level-2A surface reflectance
     # https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR
