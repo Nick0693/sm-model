@@ -38,10 +38,10 @@ def read_sensor_data(ismn_data, settings, variable=None):
         data = sensor.read_data()
         sensor_df = pd.DataFrame(data)
         sensor_df = sensor_df[sensor_df[f'{variable}_flag'] == 'G'] # filters out bad readings
-        sensor_df = sensor_df.resample('D').mean() # resamples to daily values
+        sensor_df = sensor_df.resample('D').mean() # resamples to mean daily values
         sensor_df['DATE'] = sensor_df.index.date
         sensor_df['SITE'] = station.metadata['station'][1]
-        df = df.append(sensor_df)
+        df = pd.concat([df, sensor_df])
 
     return df
 
@@ -81,7 +81,7 @@ def initialize(settings_path):
         sensor_df['DATE'] = sensor_df.index.date
         sensor_df['SITE'] = station.metadata['station'][1]
         sensor_df = sensor_df[['SITE', 'DATE', 'snow']]
-        snow_df = snow_df.append(sensor_df)
+        snow_df = pd.concat([snow_df, sensor_df])
     try:
         df = pd.merge(df, snow_df, how='left', left_on=['DATE', 'SITE'],
                       right_on=['DATE', 'SITE'])
