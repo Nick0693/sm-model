@@ -111,7 +111,7 @@ def add_cld_shdw_mask(img):
 ## with the specified bands.
 ## The buffer attribute should be equal to half the spatial resolution of the final product.
 ## The bands should be given as a list, even for single bands.
-@timeout(600) # limits the time allowed for the function to run. Increase the number if running on a slow network
+@timeout(300) # limits the time allowed for the function to run. Increase the number if running on a slow network
 def ee_to_df(ee_arr, lon, lat, buffer, int_limit, bands, start_date, end_date):
     # Converts columns to numeric values
     def to_numeric(dataframe, band):
