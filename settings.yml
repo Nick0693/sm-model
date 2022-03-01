@@ -1,7 +1,7 @@
 ### Directories ###
 project_name                    : rnn_sm_model
 wrk_dir                         : \path\to\working_directory
-data_dir                        : \path\to\data # for ICOS this will be the main folder and for ISMN it is the .zip
+data_dir                        : \path\to\data # for ICOS and ISMN this will be the main folder containing all subfolder stations
 
 ### Preprocessing specifications ###
 variables                       : ['TS', 'TA', 'P', 'VV', 'VH', 'NDVI', 'NDWI'] # soil temperature, air temperature, precipitation, vertical-vertical (SAR), vertical-horizontal (SAR), Normalized difference vegetation index, Normalized difference (vegetation) water index
