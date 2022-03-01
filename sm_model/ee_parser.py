@@ -117,24 +117,30 @@ def ee_to_df(ee_arr, lon, lat, buffer, int_limit, bands, start_date, end_date):
 
     # Transform the client-side data to a dataframe
     poi = ee.Geometry.Point(lon, lat)
-    arr = ee_arr.select(bands).getRegion(poi, 50).getInfo()
-    df = pd.DataFrame(arr)
-    headers = df.iloc[0]
-    df = pd.DataFrame(df.values[1:], columns=headers)
+    try:
+        arr = ee_arr.select(bands).getRegion(poi, 50).getInfo()
+        df = pd.DataFrame(arr)
+        headers = df.iloc[0]
+        df = pd.DataFrame(df.values[1:], columns=headers)
 
-    # Applies the to_numeric function and fills NaN rows with interpolated values
-    for band in bands:
-        df = to_numeric(df, band)
-        if int_limit > 0:
-            df[band].interpolate(method='linear', limit=int_limit, limit_direction='both',
-                                 inplace=True)
-        df.drop_duplicates(keep='first') # remove duplicates
+        # Applies the to_numeric function and fills NaN rows with interpolated values
+        for band in bands:
+            df = to_numeric(df, band)
+            if int_limit > 0:
+                df[band].interpolate(method='linear', limit=int_limit, limit_direction='both',
+                                     inplace=True)
+            df.drop_duplicates(keep='first') # remove duplicates
 
-    # Creates an index date column and drops unnecessary date, time, and coordinate columns
-    df['Date'] = pd.to_datetime(df['time'], unit='ms')
-    df['Date'] = df['Date'].dt.date
-    df.set_index('Date', inplace=True)
-    df.drop(['id', 'time', 'longitude', 'latitude'], axis=1, inplace=True)
+        # Creates an index date column and drops unnecessary date, time, and coordinate columns
+        df['Date'] = pd.to_datetime(df['time'], unit='ms')
+        df['Date'] = df['Date'].dt.date
+        df.set_index('Date', inplace=True)
+        df.drop(['id', 'time', 'longitude', 'latitude'], axis=1, inplace=True)
+
+    # Not ideal but I can't seem to catch the specific HttpError/EEException
+    except:
+        print(f'    No bands in collections: {bands}')
+        df = pd.DataFrame(columns=bands)
 
     # Drop duplicate entries from the index and reindex the dataset to daily timesteps
     df = df[~df.index.duplicated()]
