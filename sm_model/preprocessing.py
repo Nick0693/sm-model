@@ -21,14 +21,14 @@ def compile_data(settings_path):
 
     if settings['data_source'] == 'ICOS':
         df_sm = pd.read_csv(os.path.join(
-            settings['wrk_dir'], 'ICOS_Dataframe.csv'), index_col='DATE')
-        with open(os.path.join(settings['wrk_dir'], 'ICOS_siteinfo.yml')) as f:
+            settings['wrk_dir'], '{}_ICOS_Dataframe.csv'.format(settings['project_name'])), index_col='DATE')
+        with open(os.path.join(settings['wrk_dir'], '{}_ICOS_siteinfo.yml'.format(settings['project_name']))) as f:
             site_info = yaml.load(f, Loader=yaml.FullLoader)
 
     elif settings['data_source'] == 'ISMN':
         df_sm = pd.read_csv(os.path.join(
-            settings['wrk_dir'], 'ISMN_Dataframe.csv'), index_col='DATE')
-        with open(os.path.join(settings['wrk_dir'], 'ISMN_siteinfo.yml')) as f:
+            settings['wrk_dir'], '{}_ISMN_Dataframe.csv'.format(settings['project_name'])), index_col='DATE')
+        with open(os.path.join(settings['wrk_dir'], '{}_ISMN_siteinfo.yml'.format(settings['project_name']))) as f:
             site_info = yaml.load(f, Loader=yaml.FullLoader)
 
     variable_list = settings['variables']
