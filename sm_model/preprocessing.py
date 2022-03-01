@@ -53,7 +53,7 @@ def compile_data(settings_path):
         df_subset = pd.merge(df_ee, df_sm_subset, how='left', left_index=True, right_index=True)
         df_subset.rename({'SITE_x' : 'SITE'}, axis=1, inplace=True)
         df_subset.drop('SITE_y', axis=1, inplace=True)
-        df = df.append(df_subset)
+        df = pd.concat([df, df_subset])
         i_start += 1
 
     df.index.name = 'Date'
