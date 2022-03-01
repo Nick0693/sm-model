@@ -184,13 +184,16 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
     # https://developers.google.com/earth-engine/datasets/catalog/MODIS_006_MOD11A1
     # Temperature is given in Kelvin with a scaling factor of 0.02
     if 'TS' in variable_list:
-        modis = (ee.ImageCollection("MODIS/006/MOD11A1")
-                  .filterDate(start_date, end_date)
-                  .select('LST_Day_1km'))
-        lst = ee_to_df(modis, lon, lat, 5, 5, ['LST_Day_1km'], start_date, end_date)
-        lst = lst * 0.02 - 273.15 # scaling factor and Kelvin to Celcius conversion
-        lst.rename(columns={'LST_Day_1km' : 'TS'}, inplace=True)
-        dataframes.append(lst)
+        try:
+            modis = (ee.ImageCollection("MODIS/006/MOD11A1")
+                      .filterDate(start_date, end_date)
+                      .select('LST_Day_1km'))
+            lst = ee_to_df(modis, lon, lat, 5, 5, ['LST_Day_1km'], start_date, end_date)
+            lst = lst * 0.02 - 273.15 # scaling factor and Kelvin to Celcius conversion
+            lst.rename(columns={'LST_Day_1km' : 'TS'}, inplace=True)
+            dataframes.append(lst)
+        except:
+            print('    Connection timed out on variable: TS')
 
     # Sentinel-1 GRD C-band SAR data
     # https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD
@@ -221,17 +224,23 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
         s2 = s2_sr_cld_col_eval.map(add_cld_shdw_mask)
 
         if 'NDVI' in variable_list:
-            s2_ndvi = ee_to_df(s2, lon, lat, 5, 0, ['B4', 'B8'], start_date, end_date)
-            s2_ndvi = add_vegetation_index(
-                s2_ndvi, 'NDVI', 'B8', 'B4', interpolate_index=settings['interpolate_index'])
-            s2_ndvi.drop(['B4', 'B8'], axis=1, inplace=True)
-            dataframes.append(s2_ndvi)
+            try:
+                s2_ndvi = ee_to_df(s2, lon, lat, 5, 0, ['B4', 'B8'], start_date, end_date)
+                s2_ndvi = add_vegetation_index(
+                    s2_ndvi, 'NDVI', 'B8', 'B4', interpolate_index=settings['interpolate_index'])
+                s2_ndvi.drop(['B4', 'B8'], axis=1, inplace=True)
+                dataframes.append(s2_ndvi)
+            except:
+                print('    Connection timed out on variable: NDVI')
         if 'NDWI' in variable_list:
-            s2_ndwi = ee_to_df(s2, lon, lat, 5, 0, ['B8A', 'B11'], start_date, end_date)
-            s2_ndwi = add_vegetation_index(
-                s2_ndwi, 'NDWI', 'B8A', 'B11', interpolate_index=settings['interpolate_index'])
-            s2_ndwi.drop(['B8A', 'B11'], axis=1, inplace=True)
-            dataframes.append(s2_ndwi)
+            try:
+                s2_ndwi = ee_to_df(s2, lon, lat, 5, 0, ['B8A', 'B11'], start_date, end_date)
+                s2_ndwi = add_vegetation_index(
+                    s2_ndwi, 'NDWI', 'B8A', 'B11', interpolate_index=settings['interpolate_index'])
+                s2_ndwi.drop(['B8A', 'B11'], axis=1, inplace=True)
+                dataframes.append(s2_ndwi)
+            except:
+                print('    Connection timed out on variable: NDWI')
 
     # ERA-5 daily aggregate re-analysis data
     # https://developers.google.com/earth-engine/datasets/catalog/ECMWF_ERA5_DAILY
@@ -242,16 +251,22 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
                 .filterDate(start_date, end_date)
                 .select(['mean_2m_air_temperature', 'total_precipitation']))
         if 'TA' in variable_list:
-            era5_t = ee_to_df(era5, lon, lat, 5, 0, ['mean_2m_air_temperature'], start_date, end_date)
-            era5_t['mean_2m_air_temperature'] = era5_t['mean_2m_air_temperature'] - 273.15
-            era5_t.rename(columns={'mean_2m_air_temperature' : 'TA'}, inplace=True)
-            dataframes.append(era5_t)
+            try:
+                era5_t = ee_to_df(era5, lon, lat, 5, 0, ['mean_2m_air_temperature'], start_date, end_date)
+                era5_t['mean_2m_air_temperature'] = era5_t['mean_2m_air_temperature'] - 273.15
+                era5_t.rename(columns={'mean_2m_air_temperature' : 'TA'}, inplace=True)
+                dataframes.append(era5_t)
+            except:
+                print('    Connection timed out on variable: TA')
         if 'P' in variable_list:
-            era5_p = ee_to_df(era5, lon, lat, 5, 0, ['total_precipitation'], start_date, end_date)
-            era5_p['total_precipitation'] = era5_p['total_precipitation'] * 1000
-            era5_p.rename(columns={'total_precipitation' : 'P'}, inplace=True)
-            era5_p = dry_days(era5_p)
-            dataframes.append(era5_p)
+            try:
+                era5_p = ee_to_df(era5, lon, lat, 5, 0, ['total_precipitation'], start_date, end_date)
+                era5_p['total_precipitation'] = era5_p['total_precipitation'] * 1000
+                era5_p.rename(columns={'total_precipitation' : 'P'}, inplace=True)
+                era5_p = dry_days(era5_p)
+                dataframes.append(era5_p)
+            except:
+                print('    Connection timed out on variable: P')
 
     # Merge dataframes
     try:
