@@ -1,6 +1,7 @@
 import os
 import glob
 from functools import reduce
+from datetime import datetime
 
 import yaml
 import pandas as pd
@@ -111,7 +112,7 @@ def add_cld_shdw_mask(img):
 ## with the specified bands.
 ## The buffer attribute should be equal to half the spatial resolution of the final product.
 ## The bands should be given as a list, even for single bands.
-@timeout(300) # limits the time allowed for the function to run. Increase the number if running on a slow network
+@timeout(120) # limits the time allowed for the function to run. Increase the number if running on a slow network
 def ee_to_df(ee_arr, lon, lat, buffer, int_limit, bands, start_date, end_date):
     # Converts columns to numeric values
     def to_numeric(dataframe, band):
@@ -178,6 +179,8 @@ def add_vegetation_index(df, name, band_1, band_2, interpolate_index=True):
 
 def assemble_variables(lon, lat, start_date, end_date, variable_list,
                        point_id, settings):
+    datetime_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
     dataframes = []
 
     # MODIS daily land surface temperature
@@ -188,7 +191,7 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
             modis = (ee.ImageCollection("MODIS/006/MOD11A1")
                       .filterDate(start_date, end_date)
                       .select('LST_Day_1km'))
-            lst = ee_to_df(modis, lon, lat, 5, 5, ['LST_Day_1km'], start_date, end_date)
+            lst = ee_to_df(modis, lon, lat, 5, 0, ['LST_Day_1km'], start_date, end_date)
             lst = lst * 0.02 - 273.15 # scaling factor and Kelvin to Celcius conversion
             lst.rename(columns={'LST_Day_1km' : 'TS'}, inplace=True)
             dataframes.append(lst)
@@ -198,7 +201,8 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
     # Sentinel-1 GRD C-band SAR data
     # https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD
     # Values are expressed in decibel on a logarithmic scale
-    if 'VV' in variable_list or 'VH' in variable_list:
+    if (('VV' in variable_list or 'VH' in variable_list)
+        and datetime_end_date > datetime.strptime('2014-10-03', '%Y-%m-%d').date()):
         s1 = (ee.ImageCollection("COPERNICUS/S1_GRD")
               .filterDate(ee.Date(start_date), ee.Date(end_date))
               .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
@@ -219,7 +223,8 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
 
     # Sentinel-2 Level-2A surface reflectance
     # https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR
-    if 'NDVI' in variable_list or 'NDWI' in variable_list:
+    if (('NDVI' in variable_list or 'NDWI' in variable_list)
+        and datetime_end_date > datetime.strptime('2017-03-28', '%Y-%m-%d').date()):
         s2_sr_cld_col_eval = get_s2_sr_cld_col(start_date, end_date)
         s2 = s2_sr_cld_col_eval.map(add_cld_shdw_mask)
 
@@ -234,7 +239,7 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
                 print('    Connection timed out on variable: NDVI')
         if 'NDWI' in variable_list:
             try:
-                s2_ndwi = ee_to_df(s2, lon, lat, 5, 0, ['B8A', 'B11'], start_date, end_date)
+                s2_ndwi = ee_to_df(s2, lon, lat, 5, 0, ['B8', 'B11'], start_date, end_date)
                 s2_ndwi = add_vegetation_index(
                     s2_ndwi, 'NDWI', 'B8A', 'B11', interpolate_index=settings['interpolate_index'])
                 s2_ndwi.drop(['B8A', 'B11'], axis=1, inplace=True)
@@ -272,7 +277,7 @@ def assemble_variables(lon, lat, start_date, end_date, variable_list,
     try:
         df = reduce(lambda  left,right: pd.merge(left, right, on=['Date'], how='outer'), dataframes)
         df['SITE'] = point_id
-    except TypeError:
-        print('No variables specified.')
+        return df
 
-    return df
+    except TypeError:
+        print('    No variables specified.')
