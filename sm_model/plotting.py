@@ -36,7 +36,7 @@ def plot_climate(df, settings):
     # Legend and axis settings
     legend_items = ln1 + ln2 + ln3 + ln4
     labels = [l.get_label() for l in legend_items]
-    ax.legend(legend_items, labels, loc=0)
+    ax.legend(legend_items, labels, loc='upper left')
 
     ax.set_xlabel('')
     ax.set_ylabel('Soil water content (%)')
