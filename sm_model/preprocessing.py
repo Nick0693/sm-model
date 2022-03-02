@@ -44,16 +44,20 @@ def compile_data(settings_path):
         print(f'  Station {station} ({i_start} of {i_end})')
         df_sm_subset = df_sm[df_sm['SITE'] == station]
         df_sm_subset.index = pd.to_datetime(df_sm_subset.index)
-        df_ee = (ee_parser.assemble_variables(
-            site_info[station]['longitude'], site_info[station]['latitude'],
-            site_info[station]['start_date'], site_info[station]['end_date'],
-            variable_list, station, settings))
-        df_ee = df_ee.reindex(pd.date_range(
-            start=site_info[station]['start_date'], end=site_info[station]['end_date'], freq='D'))
-        df_subset = pd.merge(df_ee, df_sm_subset, how='left', left_index=True, right_index=True)
-        df_subset.rename({'SITE_x' : 'SITE'}, axis=1, inplace=True)
-        df_subset.drop('SITE_y', axis=1, inplace=True)
-        df = pd.concat([df, df_subset])
+        try:
+            df_ee = (ee_parser.assemble_variables(
+                site_info[station]['longitude'], site_info[station]['latitude'],
+                site_info[station]['start_date'], site_info[station]['end_date'],
+                variable_list, station, settings))
+            df_ee = df_ee.reindex(pd.date_range(
+                start=site_info[station]['start_date'], end=site_info[station]['end_date'], freq='D'))
+            df_subset = pd.merge(df_ee, df_sm_subset, how='left', left_index=True, right_index=True)
+            df_subset.rename({'SITE_x' : 'SITE'}, axis=1, inplace=True)
+            df_subset.drop('SITE_y', axis=1, inplace=True)
+            df = pd.concat([df, df_subset])
+        except (KeyError, AttributeError):
+            pass
+
         i_start += 1
 
     df.index.name = 'Date'
